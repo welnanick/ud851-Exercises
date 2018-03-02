@@ -18,6 +18,7 @@ package com.example.android.implicitintents;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.v4.app.ShareCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Toast;
@@ -26,8 +27,10 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
     }
 
     /**
@@ -37,8 +40,10 @@ public class MainActivity extends AppCompatActivity {
      * @param v Button that was clicked.
      */
     public void onClickOpenWebpageButton(View v) {
+
         String urlAsString = "http://www.udacity.com";
         openWebPage(urlAsString);
+
     }
 
     /**
@@ -48,15 +53,15 @@ public class MainActivity extends AppCompatActivity {
      * @param v Button that was clicked.
      */
     public void onClickOpenAddressButton(View v) {
+
         String addressString = "1600 Amphitheatre Parkway, CA";
 
         Uri.Builder builder = new Uri.Builder();
-        builder.scheme("geo")
-                .path("0,0")
-                .query(addressString);
+        builder.scheme("geo").path("0,0").query(addressString);
         Uri addressUri = builder.build();
 
         showMap(addressUri);
+
     }
 
     /**
@@ -66,10 +71,11 @@ public class MainActivity extends AppCompatActivity {
      * @param v Button that was clicked.
      */
     public void onClickShareTextButton(View v) {
-        // TODO (5) Specify a String you'd like to share
 
-        // TODO (6) Replace the Toast with shareText, passing in the String from step 5
-        Toast.makeText(this, "TODO: Share text when this is clicked", Toast.LENGTH_LONG).show();
+        String textToShare = "Hello World!";
+
+        shareText(textToShare);
+
     }
 
     /**
@@ -77,15 +83,14 @@ public class MainActivity extends AppCompatActivity {
      * similar to what I've done above. You can view a list of implicit Intents on the Common
      * Intents page from the developer documentation.
      *
-     * @see <http://developer.android.com/guide/components/intents-common.html/>
-     *
      * @param v Button that was clicked.
+     *
+     * @see <http://developer.android.com/guide/components/intents-common.html/>
      */
     public void createYourOwn(View v) {
-        Toast.makeText(this,
-                "TODO: Create Your Own Implicit Intent",
-                Toast.LENGTH_SHORT)
-                .show();
+
+        Toast.makeText(this, "TODO: Create Your Own Implicit Intent", Toast.LENGTH_SHORT).show();
+
     }
 
     /**
@@ -95,6 +100,7 @@ public class MainActivity extends AppCompatActivity {
      *            scheme of the URI expected with this Intent according to the Common Intents page
      */
     private void openWebPage(String url) {
+
         /*
          * We wanted to demonstrate the Uri.parse method because its usage occurs frequently. You
          * could have just as easily passed in a Uri as the parameter of this method.
@@ -113,13 +119,16 @@ public class MainActivity extends AppCompatActivity {
          * with the data we've specified. Without this check, in those cases your app would crash.
          */
         if (intent.resolveActivity(getPackageManager()) != null) {
+
             startActivity(intent);
+
         }
+
     }
 
     /**
      * This method will fire off an implicit Intent to view a location on a map.
-     *
+     * <p>
      * When constructing implicit Intents, you can use either the setData method or specify the
      * URI as the second parameter of the Intent's constructor,
      * as I do in {@link #openWebPage(String)}
@@ -127,6 +136,7 @@ public class MainActivity extends AppCompatActivity {
      * @param geoLocation The Uri representing the location that will be opened in the map
      */
     private void showMap(Uri geoLocation) {
+
         /*
          * Again, we create an Intent with the action, ACTION_VIEW because we want to VIEW the
          * contents of this Uri.
@@ -139,16 +149,27 @@ public class MainActivity extends AppCompatActivity {
          */
         intent.setData(geoLocation);
         if (intent.resolveActivity(getPackageManager()) != null) {
+
             startActivity(intent);
+
         }
+
     }
 
-    // TODO (1) Create a void method called shareText that accepts a String as a parameter
-    // Do steps 2 - 4 within the shareText method
+    private void shareText(String text) {
 
-        // TODO (2) Create a String variable called mimeType and set it to "text/plain"
+        String mimeType = "text/plain";
 
-        // TODO (3) Create a title for the chooser window that will pop up
+        String title = "Learning How to Share";
+        Intent intent =
+                ShareCompat.IntentBuilder.from(this).setChooserTitle(title).setType(mimeType)
+                                         .setText(text).getIntent();
+        if (intent.resolveActivity(getPackageManager()) != null) {
 
-        // TODO (4) Use ShareCompat.IntentBuilder to build the Intent and start the chooser
+            startActivity(intent);
+
+        }
+
+    }
+
 }
