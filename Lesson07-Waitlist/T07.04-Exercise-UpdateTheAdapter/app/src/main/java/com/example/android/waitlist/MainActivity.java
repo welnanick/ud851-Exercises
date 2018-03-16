@@ -12,16 +12,14 @@ import com.example.android.waitlist.data.TestUtil;
 import com.example.android.waitlist.data.WaitlistContract;
 import com.example.android.waitlist.data.WaitlistDbHelper;
 
-
 public class MainActivity extends AppCompatActivity {
 
     private GuestListAdapter mAdapter;
-
     private SQLiteDatabase mDb;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
@@ -32,7 +30,6 @@ public class MainActivity extends AppCompatActivity {
 
         // Set layout for the RecyclerView, because it's a list we are using the linear layout
         waitlistRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-
 
         // Create a DB helper (this will create the DB if run for the first time)
         WaitlistDbHelper dbHelper = new WaitlistDbHelper(this);
@@ -47,9 +44,8 @@ public class MainActivity extends AppCompatActivity {
         // Get all guest info from the database and save in a cursor
         Cursor cursor = getAllGuests();
 
-        // TODO (10) Pass the entire cursor to the adapter rather than just the count
         // Create an adapter for that cursor to display the data
-        mAdapter = new GuestListAdapter(this, cursor.getCount());
+        mAdapter = new GuestListAdapter(this, cursor);
 
         // Link the adapter to the RecyclerView
         waitlistRecyclerView.setAdapter(mAdapter);
@@ -65,24 +61,15 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-
-
     /**
      * Query the mDb and get all guests from the waitlist table
      *
      * @return Cursor containing the list of guests
      */
     private Cursor getAllGuests() {
-        return mDb.query(
-                WaitlistContract.WaitlistEntry.TABLE_NAME,
-                null,
-                null,
-                null,
-                null,
-                null,
-                WaitlistContract.WaitlistEntry.COLUMN_TIMESTAMP
-        );
-    }
 
+        return mDb.query(WaitlistContract.WaitlistEntry.TABLE_NAME, null, null, null, null, null,
+                WaitlistContract.WaitlistEntry.COLUMN_TIMESTAMP);
+    }
 
 }
