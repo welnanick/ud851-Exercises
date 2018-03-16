@@ -16,6 +16,7 @@
 package com.example.android.asynctaskloader;
 
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.AsyncTaskLoader;
 import android.support.v4.content.Loader;
@@ -33,51 +34,50 @@ import com.example.android.asynctaskloader.utilities.NetworkUtils;
 import java.io.IOException;
 import java.net.URL;
 
-public class MainActivity extends AppCompatActivity implements
-        LoaderManager.LoaderCallbacks<String> {
+public class MainActivity extends AppCompatActivity
+        implements LoaderManager.LoaderCallbacks<String> {
 
     /* A constant to save and restore the URL that is being displayed */
     private static final String SEARCH_QUERY_URL_EXTRA = "query";
-
     /*
      * This number will uniquely identify our Loader and is chosen arbitrarily. You can change this
      * to any number you like, as long as you use the same variable name.
      */
     private static final int GITHUB_SEARCH_LOADER = 22;
-
     private EditText mSearchBoxEditText;
-
     private TextView mUrlDisplayTextView;
     private TextView mSearchResultsTextView;
-
     private TextView mErrorMessageDisplay;
-
     private ProgressBar mLoadingIndicator;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        mSearchBoxEditText = (EditText) findViewById(R.id.et_search_box);
+        mSearchBoxEditText = findViewById(R.id.et_search_box);
 
-        mUrlDisplayTextView = (TextView) findViewById(R.id.tv_url_display);
-        mSearchResultsTextView = (TextView) findViewById(R.id.tv_github_search_results_json);
+        mUrlDisplayTextView = findViewById(R.id.tv_url_display);
+        mSearchResultsTextView = findViewById(R.id.tv_github_search_results_json);
 
-        mErrorMessageDisplay = (TextView) findViewById(R.id.tv_error_message_display);
+        mErrorMessageDisplay = findViewById(R.id.tv_error_message_display);
 
-        mLoadingIndicator = (ProgressBar) findViewById(R.id.pb_loading_indicator);
+        mLoadingIndicator = findViewById(R.id.pb_loading_indicator);
 
         if (savedInstanceState != null) {
+
             String queryUrl = savedInstanceState.getString(SEARCH_QUERY_URL_EXTRA);
 
             mUrlDisplayTextView.setText(queryUrl);
+
         }
 
         /*
          * Initialize the loader
          */
         getSupportLoaderManager().initLoader(GITHUB_SEARCH_LOADER, null, this);
+
     }
 
     /**
@@ -86,6 +86,7 @@ public class MainActivity extends AppCompatActivity implements
      * that URL in a TextView, and finally request that an AsyncTaskLoader performs the GET request.
      */
     private void makeGithubSearchQuery() {
+
         String githubQuery = mSearchBoxEditText.getText().toString();
 
         /*
@@ -100,8 +101,10 @@ public class MainActivity extends AppCompatActivity implements
          * was the simplest.
          */
         if (TextUtils.isEmpty(githubQuery)) {
+
             mUrlDisplayTextView.setText("No query entered, nothing to search for.");
             return;
+
         }
 
         URL githubSearchUrl = NetworkUtils.buildUrl(githubQuery);
@@ -127,10 +130,16 @@ public class MainActivity extends AppCompatActivity implements
         LoaderManager loaderManager = getSupportLoaderManager();
         Loader<String> githubSearchLoader = loaderManager.getLoader(GITHUB_SEARCH_LOADER);
         if (githubSearchLoader == null) {
+
             loaderManager.initLoader(GITHUB_SEARCH_LOADER, queryBundle, this);
-        } else {
-            loaderManager.restartLoader(GITHUB_SEARCH_LOADER, queryBundle, this);
+
         }
+        else {
+
+            loaderManager.restartLoader(GITHUB_SEARCH_LOADER, queryBundle, this);
+
+        }
+
     }
 
     /**
@@ -141,10 +150,12 @@ public class MainActivity extends AppCompatActivity implements
      * need to check whether each view is currently visible or invisible.
      */
     private void showJsonDataView() {
+
         /* First, make sure the error is invisible */
         mErrorMessageDisplay.setVisibility(View.INVISIBLE);
         /* Then, make sure the JSON data is visible */
         mSearchResultsTextView.setVisibility(View.VISIBLE);
+
     }
 
     /**
@@ -155,24 +166,29 @@ public class MainActivity extends AppCompatActivity implements
      * need to check whether each view is currently visible or invisible.
      */
     private void showErrorMessage() {
+
         /* First, hide the currently visible data */
         mSearchResultsTextView.setVisibility(View.INVISIBLE);
         /* Then, show the error */
         mErrorMessageDisplay.setVisibility(View.VISIBLE);
+
     }
 
     @Override
     public Loader<String> onCreateLoader(int id, final Bundle args) {
+
         return new AsyncTaskLoader<String>(this) {
 
-            // TODO (1) Create a String member variable called mGithubJson that will store the raw JSON
+            String githubJson;
 
             @Override
             protected void onStartLoading() {
 
                 /* If no arguments were passed, we don't have a query to perform. Simply return. */
                 if (args == null) {
+
                     return;
+
                 }
 
                 /*
@@ -181,8 +197,17 @@ public class MainActivity extends AppCompatActivity implements
                  */
                 mLoadingIndicator.setVisibility(View.VISIBLE);
 
-                // TODO (2) If mGithubJson is not null, deliver that result. Otherwise, force a load
-                forceLoad();
+                if (githubJson != null) {
+
+                    deliverResult(githubJson);
+
+                }
+                else {
+
+                    forceLoad();
+
+                }
+
             }
 
             @Override
@@ -193,23 +218,38 @@ public class MainActivity extends AppCompatActivity implements
 
                 /* If the user didn't enter anything, there's nothing to search for */
                 if (searchQueryUrlString == null || TextUtils.isEmpty(searchQueryUrlString)) {
+
                     return null;
+
                 }
 
                 /* Parse the URL from the passed in String and perform the search */
                 try {
+
                     URL githubUrl = new URL(searchQueryUrlString);
                     String githubSearchResults = NetworkUtils.getResponseFromHttpUrl(githubUrl);
                     return githubSearchResults;
-                } catch (IOException e) {
+
+                }
+                catch (IOException e) {
+
                     e.printStackTrace();
                     return null;
+
                 }
+
             }
 
-            // TODO (3) Override deliverResult and store the data in mGithubJson
-            // TODO (4) Call super.deliverResult after storing the data
+            @Override
+            public void deliverResult(@Nullable String data) {
+
+                githubJson = data;
+                super.deliverResult(data);
+
+            }
+
         };
+
     }
 
     @Override
@@ -222,11 +262,17 @@ public class MainActivity extends AppCompatActivity implements
          * methods for checking errors, but we wanted to keep this particular example simple.
          */
         if (null == data) {
+
             showErrorMessage();
-        } else {
+
+        }
+        else {
+
             mSearchResultsTextView.setText(data);
             showJsonDataView();
+
         }
+
     }
 
     @Override
@@ -239,25 +285,34 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
+
         getMenuInflater().inflate(R.menu.main, menu);
         return true;
+
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+
         int itemThatWasClickedId = item.getItemId();
         if (itemThatWasClickedId == R.id.action_search) {
+
             makeGithubSearchQuery();
             return true;
+
         }
         return super.onOptionsItemSelected(item);
+
     }
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
+
         super.onSaveInstanceState(outState);
 
         String queryUrl = mUrlDisplayTextView.getText().toString();
         outState.putString(SEARCH_QUERY_URL_EXTRA, queryUrl);
+
     }
+
 }

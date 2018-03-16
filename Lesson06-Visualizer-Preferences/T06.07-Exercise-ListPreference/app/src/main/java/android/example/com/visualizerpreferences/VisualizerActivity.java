@@ -33,7 +33,8 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.Toast;
 
-public class VisualizerActivity extends AppCompatActivity implements SharedPreferences.OnSharedPreferenceChangeListener {
+public class VisualizerActivity extends AppCompatActivity
+        implements SharedPreferences.OnSharedPreferenceChangeListener {
 
     private static final int MY_PERMISSION_RECORD_AUDIO_REQUEST_CODE = 88;
     private VisualizerView mVisualizerView;
@@ -41,47 +42,68 @@ public class VisualizerActivity extends AppCompatActivity implements SharedPrefe
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_visualizer);
         mVisualizerView = (VisualizerView) findViewById(R.id.activity_visualizer);
         setupSharedPreferences();
         setupPermissions();
     }
-
-    // TODO (4) Update setupSharedPreferences and onSharedPreferenceChanged to load the color
+    
     // from shared preferences. Call setColor, passing in the color you got
     private void setupSharedPreferences() {
         // Get all of the values from shared preferences to set it up
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-        mVisualizerView.setShowBass(sharedPreferences.getBoolean(getString(R.string.pref_show_bass_key),
-                getResources().getBoolean(R.bool.pref_show_bass_default)));
-        mVisualizerView.setShowMid(sharedPreferences.getBoolean(getString(R.string.pref_show_mid_range_key),
-                getResources().getBoolean(R.bool.pref_show_mid_range_default)));
-        mVisualizerView.setShowTreble(sharedPreferences.getBoolean(getString(R.string.pref_show_treble_key),
-                getResources().getBoolean(R.bool.pref_show_treble_default)));
+        mVisualizerView.setShowBass(sharedPreferences
+                .getBoolean(getString(R.string.pref_show_bass_key),
+                        getResources().getBoolean(R.bool.pref_show_bass_default)));
+        mVisualizerView.setShowMid(sharedPreferences
+                .getBoolean(getString(R.string.pref_show_mid_range_key),
+                        getResources().getBoolean(R.bool.pref_show_mid_range_default)));
+        mVisualizerView.setShowTreble(sharedPreferences
+                .getBoolean(getString(R.string.pref_show_treble_key),
+                        getResources().getBoolean(R.bool.pref_show_treble_default)));
         mVisualizerView.setMinSizeScale(1);
-        mVisualizerView.setColor(getString(R.string.pref_color_red_value));
+        loadColorFromPreferences(sharedPreferences);
         // Register the listener
         sharedPreferences.registerOnSharedPreferenceChangeListener(this);
     }
 
+    public void loadColorFromPreferences(SharedPreferences preferences) {
+
+        mVisualizerView.setColor(preferences.getString(getString(R.string.pref_color_key),
+                getString(R.string.pref_color_red_value)));
+
+    }
+
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+
         if (key.equals(getString(R.string.pref_show_bass_key))) {
-            mVisualizerView.setShowBass(sharedPreferences.getBoolean(key, getResources().getBoolean(R.bool.pref_show_bass_default)));
-        } else if (key.equals(getString(R.string.pref_show_mid_range_key))) {
-            mVisualizerView.setShowMid(sharedPreferences.getBoolean(key, getResources().getBoolean(R.bool.pref_show_mid_range_default)));
-        } else if (key.equals(getString(R.string.pref_show_treble_key))) {
-            mVisualizerView.setShowTreble(sharedPreferences.getBoolean(key, getResources().getBoolean(R.bool.pref_show_treble_default)));
+            mVisualizerView.setShowBass(sharedPreferences
+                    .getBoolean(key, getResources().getBoolean(R.bool.pref_show_bass_default)));
+        }
+        else if (key.equals(getString(R.string.pref_show_mid_range_key))) {
+            mVisualizerView.setShowMid(sharedPreferences.getBoolean(key,
+                    getResources().getBoolean(R.bool.pref_show_mid_range_default)));
+        }
+        else if (key.equals(getString(R.string.pref_show_treble_key))) {
+            mVisualizerView.setShowTreble(sharedPreferences
+                    .getBoolean(key, getResources().getBoolean(R.bool.pref_show_treble_default)));
+        }
+        else if (key.equals(getString(R.string.pref_color_key))) {
+            loadColorFromPreferences(sharedPreferences);
         }
     }
 
     @Override
     protected void onDestroy() {
+
         super.onDestroy();
-        // Unregister VisualizerActivity as an OnPreferenceChangedListener to avoid any memory leaks.
+        // Unregister VisualizerActivity as an OnPreferenceChangedListener to avoid any memory
+        // leaks.
         PreferenceManager.getDefaultSharedPreferences(this)
-                .unregisterOnSharedPreferenceChangeListener(this);
+                         .unregisterOnSharedPreferenceChangeListener(this);
     }
 
     /**
@@ -99,6 +121,7 @@ public class VisualizerActivity extends AppCompatActivity implements SharedPrefe
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+
         int id = item.getItemId();
         if (id == R.id.action_settings) {
             Intent startSettingsActivity = new Intent(this, SettingsActivity.class);
@@ -112,12 +135,12 @@ public class VisualizerActivity extends AppCompatActivity implements SharedPrefe
      * Below this point is code you do not need to modify; it deals with permissions
      * and starting/cleaning up the AudioInputReader
      **/
-
     /**
      * onPause Cleanup audio stream
      **/
     @Override
     protected void onPause() {
+
         super.onPause();
         if (mAudioInputReader != null) {
             mAudioInputReader.shutdown(isFinishing());
@@ -126,43 +149,49 @@ public class VisualizerActivity extends AppCompatActivity implements SharedPrefe
 
     @Override
     protected void onResume() {
+
         super.onResume();
         if (mAudioInputReader != null) {
             mAudioInputReader.restart();
         }
     }
-    
+
     /**
      * App Permissions for Audio
      **/
     private void setupPermissions() {
         // If we don't have the record audio permission...
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) !=
+                PackageManager.PERMISSION_GRANTED) {
             // And if we're on SDK M or later...
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 // Ask again, nicely, for the permissions.
-                String[] permissionsWeNeed = new String[]{ Manifest.permission.RECORD_AUDIO };
+                String[] permissionsWeNeed = new String[]{Manifest.permission.RECORD_AUDIO};
                 requestPermissions(permissionsWeNeed, MY_PERMISSION_RECORD_AUDIO_REQUEST_CODE);
             }
-        } else {
+        }
+        else {
             // Otherwise, permissions were granted and we are ready to go!
             mAudioInputReader = new AudioInputReader(mVisualizerView, this);
         }
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode,
-                                           @NonNull String permissions[], @NonNull int[] grantResults) {
+    public void onRequestPermissionsResult(int requestCode, @NonNull String permissions[],
+                                           @NonNull int[] grantResults) {
+
         switch (requestCode) {
             case MY_PERMISSION_RECORD_AUDIO_REQUEST_CODE: {
                 // If request is cancelled, the result arrays are empty.
-                if (grantResults.length > 0
-                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                if (grantResults.length > 0 &&
+                        grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     // The permission was granted! Start up the visualizer!
                     mAudioInputReader = new AudioInputReader(mVisualizerView, this);
 
-                } else {
-                    Toast.makeText(this, "Permission for audio not granted. Visualizer can't run.", Toast.LENGTH_LONG).show();
+                }
+                else {
+                    Toast.makeText(this, "Permission for audio not granted. Visualizer can't run.",
+                            Toast.LENGTH_LONG).show();
                     finish();
                     // The permission was denied, so we can show a message why we can't run the app
                     // and then close the app.

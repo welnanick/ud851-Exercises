@@ -25,11 +25,9 @@ import android.support.v7.preference.ListPreference;
 import android.support.v7.preference.Preference;
 import android.support.v7.preference.PreferenceFragmentCompat;
 import android.support.v7.preference.PreferenceScreen;
-import android.widget.Toast;
 
-
-public class SettingsFragment extends PreferenceFragmentCompat implements
-        OnSharedPreferenceChangeListener {
+public class SettingsFragment extends PreferenceFragmentCompat
+        implements OnSharedPreferenceChangeListener {
 
     @Override
     public void onCreatePreferences(Bundle bundle, String s) {
@@ -73,7 +71,7 @@ public class SettingsFragment extends PreferenceFragmentCompat implements
      * @param value      The value that the preference was updated to
      */
     private void setPreferenceSummary(Preference preference, String value) {
-        // TODO (3) Don't forget to add code here to properly set the summary for an EditTextPreference
+
         if (preference instanceof ListPreference) {
             // For list preferences, figure out the label of the selected value
             ListPreference listPreference = (ListPreference) preference;
@@ -83,19 +81,26 @@ public class SettingsFragment extends PreferenceFragmentCompat implements
                 listPreference.setSummary(listPreference.getEntries()[prefIndex]);
             }
         }
+        else if (preference instanceof EditTextPreference) {
+
+            EditTextPreference editTextPreference = (EditTextPreference) preference;
+            editTextPreference.setSummary(value);
+
+        }
     }
-    
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
-        getPreferenceScreen().getSharedPreferences()
-                .registerOnSharedPreferenceChangeListener(this);
+        getPreferenceScreen().getSharedPreferences().registerOnSharedPreferenceChangeListener(this);
     }
 
     @Override
     public void onDestroy() {
+
         super.onDestroy();
         getPreferenceScreen().getSharedPreferences()
-                .unregisterOnSharedPreferenceChangeListener(this);
+                             .unregisterOnSharedPreferenceChangeListener(this);
     }
 }

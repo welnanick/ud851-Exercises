@@ -14,7 +14,6 @@ public class MainActivity extends AppCompatActivity {
      * being posted.
      */
     private static final String TAG = MainActivity.class.getSimpleName();
-
     /* Constant values for the names of each respective lifecycle callback */
     private static final String ON_CREATE = "onCreate";
     private static final String ON_START = "onStart";
@@ -24,7 +23,6 @@ public class MainActivity extends AppCompatActivity {
     private static final String ON_RESTART = "onRestart";
     private static final String ON_DESTROY = "onDestroy";
     private static final String ON_SAVE_INSTANCE_STATE = "onSaveInstanceState";
-
     /*
      * This TextView will contain a running log of every lifecycle callback method called from this
      * Activity. This TextView can be reset to its default state by clicking the Button labeled
@@ -35,32 +33,70 @@ public class MainActivity extends AppCompatActivity {
     /**
      * Called when the activity is first created. This is where you should do all of your normal
      * static set up: create views, bind data to lists, etc.
-     *
+     * <p>
      * Always followed by onStart().
      *
      * @param savedInstanceState The Activity's previously frozen state, if there was one.
      */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
         mLifecycleDisplay = (TextView) findViewById(R.id.tv_lifecycle_events_display);
 
-        // TODO (1) Use logAndAppend within onCreate
+        logAndAppend(ON_CREATE);
+
     }
 
-    // TODO (2) Override onStart, call super.onStart, and call logAndAppend with ON_START
+    @Override
+    protected void onStart() {
 
-    // TODO (3) Override onResume, call super.onResume, and call logAndAppend with ON_RESUME
+        super.onStart();
+        logAndAppend(ON_START);
 
-    // TODO (4) Override onPause, call super.onPause, and call logAndAppend with ON_PAUSE
+    }
 
-    // TODO (5) Override onStop, call super.onStop, and call logAndAppend with ON_STOP
+    @Override
+    protected void onResume() {
 
-    // TODO (6) Override onRestart, call super.onRestart, and call logAndAppend with ON_RESTART
+        super.onResume();
+        logAndAppend(ON_RESUME);
 
-    // TODO (7) Override onDestroy, call super.onDestroy, and call logAndAppend with ON_DESTROY
+    }
+
+    @Override
+    protected void onPause() {
+
+        super.onPause();
+        logAndAppend(ON_PAUSE);
+
+    }
+
+    @Override
+    protected void onStop() {
+
+        super.onStop();
+        logAndAppend(ON_STOP);
+
+    }
+
+    @Override
+    protected void onRestart() {
+
+        super.onRestart();
+        logAndAppend(ON_RESTART);
+
+    }
+
+    @Override
+    protected void onDestroy() {
+
+        super.onDestroy();
+        logAndAppend(ON_DESTROY);
+
+    }
 
     /**
      * Logs to the console and appends the lifecycle method name to the TextView so that you can
@@ -70,9 +106,11 @@ public class MainActivity extends AppCompatActivity {
      * @param lifecycleEvent The name of the event to be logged.
      */
     private void logAndAppend(String lifecycleEvent) {
+
         Log.d(TAG, "Lifecycle Event: " + lifecycleEvent);
 
         mLifecycleDisplay.append(lifecycleEvent + "\n");
+
     }
 
     /**
@@ -81,6 +119,9 @@ public class MainActivity extends AppCompatActivity {
      * @param view The View that was clicked. In this case, it is the Button from our layout.
      */
     public void resetLifecycleDisplay(View view) {
+
         mLifecycleDisplay.setText("Lifecycle callbacks:\n");
+
     }
+
 }

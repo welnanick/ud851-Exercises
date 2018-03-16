@@ -6,6 +6,9 @@ import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class MainActivity extends AppCompatActivity {
 
     /*
@@ -14,14 +17,12 @@ public class MainActivity extends AppCompatActivity {
      * being posted.
      */
     private static final String TAG = MainActivity.class.getSimpleName();
-
     /*
      * This constant String will be used to store the content of the TextView used to display the
      * list of callbacks. The reason we are storing the contents of the TextView is so that you can
      * see the entire set of callbacks as they are called.
      */
     private static final String LIFECYCLE_CALLBACKS_TEXT_KEY = "callbacks";
-
     /* Constant values for the names of each respective lifecycle callback */
     private static final String ON_CREATE = "onCreate";
     private static final String ON_START = "onStart";
@@ -31,26 +32,25 @@ public class MainActivity extends AppCompatActivity {
     private static final String ON_RESTART = "onRestart";
     private static final String ON_DESTROY = "onDestroy";
     private static final String ON_SAVE_INSTANCE_STATE = "onSaveInstanceState";
-
     /*
      * This TextView will contain a running log of every lifecycle callback method called from this
      * Activity. This TextView can be reset to its default state by clicking the Button labeled
      * "Reset Log"
      */
     private TextView mLifecycleDisplay;
-
-    // TODO (1) Declare and instantiate a static ArrayList of Strings called mLifecycleCallbacks
+    private static final List<String> lifecycleCallbacks = new ArrayList<>();
 
     /**
      * Called when the activity is first created. This is where you should do all of your normal
      * static set up: create views, bind data to lists, etc.
-     *
+     * <p>
      * Always followed by onStart().
      *
      * @param savedInstanceState The Activity's previously frozen state, if there was one.
      */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
@@ -64,44 +64,57 @@ public class MainActivity extends AppCompatActivity {
          * contains that key, we set the contents of the TextView accordingly.
          */
         if (savedInstanceState != null) {
+
             if (savedInstanceState.containsKey(LIFECYCLE_CALLBACKS_TEXT_KEY)) {
-                String allPreviousLifecycleCallbacks = savedInstanceState
-                        .getString(LIFECYCLE_CALLBACKS_TEXT_KEY);
+
+                String allPreviousLifecycleCallbacks =
+                        savedInstanceState.getString(LIFECYCLE_CALLBACKS_TEXT_KEY);
                 mLifecycleDisplay.setText(allPreviousLifecycleCallbacks);
+
             }
+
         }
 
-        // TODO (4) Iterate backwards through mLifecycleCallbacks, appending each String and a newline to mLifecycleDisplay
+        for (String callback : lifecycleCallbacks) {
 
-        // TODO (5) Clear mLifecycleCallbacks after iterating through it
+            mLifecycleDisplay.append(callback + "\n");
+
+        }
+
+        lifecycleCallbacks.clear();
 
         logAndAppend(ON_CREATE);
+
     }
 
     /**
      * Called when the activity is becoming visible to the user.
-     *
+     * <p>
      * Followed by onResume() if the activity comes to the foreground, or onStop() if it becomes
      * hidden.
      */
     @Override
     protected void onStart() {
+
         super.onStart();
 
         logAndAppend(ON_START);
+
     }
 
     /**
      * Called when the activity will start interacting with the user. At this point your activity
      * is at the top of the activity stack, with user input going to it.
-     *
+     * <p>
      * Always followed by onPause().
      */
     @Override
     protected void onResume() {
+
         super.onResume();
 
         logAndAppend(ON_RESUME);
+
     }
 
     /**
@@ -109,15 +122,17 @@ public class MainActivity extends AppCompatActivity {
      * used to commit unsaved changes to persistent data, stop animations and other things that may
      * be consuming CPU, etc. Implementations of this method must be very quick because the next
      * activity will not be resumed until this method returns.
-     *
+     * <p>
      * Followed by either onResume() if the activity returns back to the front, or onStop() if it
      * becomes invisible to the user.
      */
     @Override
     protected void onPause() {
+
         super.onPause();
 
         logAndAppend(ON_PAUSE);
+
     }
 
     /**
@@ -125,31 +140,34 @@ public class MainActivity extends AppCompatActivity {
      * resumed and is covering this one. This may happen either because a new activity is being
      * started, an existing one is being brought in front of this one, or this one is being
      * destroyed.
-     *
+     * <p>
      * Followed by either onRestart() if this activity is coming back to interact with the user, or
      * onDestroy() if this activity is going away.
      */
     @Override
     protected void onStop() {
+
         super.onStop();
 
-        // TODO (2) Add the ON_STOP String to the front of mLifecycleCallbacks
-
+        lifecycleCallbacks.add(ON_STOP);
         logAndAppend(ON_STOP);
+
     }
 
     /**
      * Called after your activity has been stopped, prior to it being started again.
-     *
+     * <p>
      * Always followed by onStart()
      */
     @Override
     protected void onRestart() {
+
         super.onRestart();
 
         logAndAppend(ON_RESTART);
+
     }
-    
+
     /**
      * The final call you receive before your activity is destroyed. This can happen either because
      * the activity is finishing (someone called finish() on it, or because the system is
@@ -158,19 +176,23 @@ public class MainActivity extends AppCompatActivity {
      */
     @Override
     protected void onDestroy() {
+
         super.onDestroy();
 
-        // TODO (3) Add the ON_DESTROY String to the front of mLifecycleCallbacks
+        lifecycleCallbacks.add(ON_DESTROY);
 
         logAndAppend(ON_DESTROY);
+
     }
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
+
         super.onSaveInstanceState(outState);
         logAndAppend(ON_SAVE_INSTANCE_STATE);
         String lifecycleDisplayTextViewContents = mLifecycleDisplay.getText().toString();
         outState.putString(LIFECYCLE_CALLBACKS_TEXT_KEY, lifecycleDisplayTextViewContents);
+
     }
 
     /**
@@ -181,9 +203,11 @@ public class MainActivity extends AppCompatActivity {
      * @param lifecycleEvent The name of the event to be logged.
      */
     private void logAndAppend(String lifecycleEvent) {
+
         Log.d(TAG, "Lifecycle Event: " + lifecycleEvent);
 
         mLifecycleDisplay.append(lifecycleEvent + "\n");
+
     }
 
     /**
@@ -192,6 +216,9 @@ public class MainActivity extends AppCompatActivity {
      * @param view The View that was clicked. In this case, it is the Button from our layout.
      */
     public void resetLifecycleDisplay(View view) {
+
         mLifecycleDisplay.setText("Lifecycle callbacks:\n");
+
     }
+
 }
