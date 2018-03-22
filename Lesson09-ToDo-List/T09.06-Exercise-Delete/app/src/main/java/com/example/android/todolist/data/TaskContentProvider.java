@@ -13,7 +13,6 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-
 package com.example.android.todolist.data;
 
 import android.content.ContentProvider;
@@ -26,6 +25,8 @@ import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 
+import com.example.android.todolist.data.TaskContract.TaskEntry;
+
 import static com.example.android.todolist.data.TaskContract.TaskEntry.TABLE_NAME;
 
 // Verify that TaskContentProvider extends from ContentProvider and implements required methods
@@ -36,14 +37,14 @@ public class TaskContentProvider extends ContentProvider {
     // and related ints (101, 102, ..) for items in that directory.
     public static final int TASKS = 100;
     public static final int TASK_WITH_ID = 101;
-
     // CDeclare a static variable for the Uri matcher that you construct
     private static final UriMatcher sUriMatcher = buildUriMatcher();
 
     // Define a static buildUriMatcher method that associates URI's with their int match
+
     /**
-     Initialize a new matcher object without any matches,
-     then use .addURI(String authority, String path, int match) to add matches
+     * Initialize a new matcher object without any matches,
+     * then use .addURI(String authority, String path, int match) to add matches
      */
     public static UriMatcher buildUriMatcher() {
 
@@ -79,7 +80,6 @@ public class TaskContentProvider extends ContentProvider {
         return true;
     }
 
-
     // Implement insert to handle requests to insert a single new row of data
     @Override
     public Uri insert(@NonNull Uri uri, ContentValues values) {
@@ -95,9 +95,10 @@ public class TaskContentProvider extends ContentProvider {
                 // Insert new values into the database
                 // Inserting values into tasks table
                 long id = db.insert(TABLE_NAME, null, values);
-                if ( id > 0 ) {
+                if (id > 0) {
                     returnUri = ContentUris.withAppendedId(TaskContract.TaskEntry.CONTENT_URI, id);
-                } else {
+                }
+                else {
                     throw new android.database.SQLException("Failed to insert row into " + uri);
                 }
                 break;
@@ -113,7 +114,6 @@ public class TaskContentProvider extends ContentProvider {
         // Return constructed uri (this points to the newly inserted row of data)
         return returnUri;
     }
-
 
     // Implement query to handle requests for data by URI
     @Override
@@ -131,12 +131,7 @@ public class TaskContentProvider extends ContentProvider {
         switch (match) {
             // Query for the tasks directory
             case TASKS:
-                retCursor =  db.query(TABLE_NAME,
-                        projection,
-                        selection,
-                        selectionArgs,
-                        null,
-                        null,
+                retCursor = db.query(TABLE_NAME, projection, selection, selectionArgs, null, null,
                         sortOrder);
                 break;
             // Default exception
@@ -151,21 +146,37 @@ public class TaskContentProvider extends ContentProvider {
         return retCursor;
     }
 
-
     // Implement delete to delete a single row of data
     @Override
     public int delete(@NonNull Uri uri, String selection, String[] selectionArgs) {
 
-        // TODO (1) Get access to the database and write URI matching code to recognize a single item
+        SQLiteDatabase database = mTaskDbHelper.getWritableDatabase();
 
-        // TODO (2) Write the code to delete a single row of data
-        // [Hint] Use selections to delete an item by its row ID
+        int match = sUriMatcher.match(uri);
+        int numberDeleted;
 
-        // TODO (3) Notify the resolver of a change and return the number of items deleted
+        switch (match) {
 
-        throw new UnsupportedOperationException("Not yet implemented");
+            case TASK_WITH_ID:
+                String id = uri.getPathSegments().get(1);
+                String selectionString = "_id=?";
+                String[] selectionArgsArray = new String[]{id};
+
+                numberDeleted =
+                        database.delete(TaskEntry.TABLE_NAME, selectionString, selectionArgsArray);
+                break;
+            default:
+                throw new UnsupportedOperationException("Unknown uri: " + uri);
+
+        }
+
+        if (numberDeleted != 0) {
+
+            getContext().getContentResolver().notifyChange(uri, null);
+
+        }
+        return numberDeleted;
     }
-
 
     @Override
     public int update(@NonNull Uri uri, ContentValues values, String selection,
@@ -173,7 +184,6 @@ public class TaskContentProvider extends ContentProvider {
 
         throw new UnsupportedOperationException("Not yet implemented");
     }
-
 
     @Override
     public String getType(@NonNull Uri uri) {
